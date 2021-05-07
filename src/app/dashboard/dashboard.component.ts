@@ -5,6 +5,7 @@ import { Title } from '@angular/platform-browser';
 import { Book } from "app/models/book";
 import { Reader } from "app/models/reader";
 import { DataService } from 'app/core/data.service';
+import { BookTrackerError } from 'app/models/bookTrackerError';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,9 +20,13 @@ export class DashboardComponent implements OnInit {
 
   constructor(private dataService: DataService,
               private title: Title) { }
-  
+
   ngOnInit() {
-    this.allBooks = this.dataService.getAllBooks();
+    this.dataService.getAllBooks().subscribe(
+      (data: Book[]  | BookTrackerError) =>  this.allBooks = <Book[]>data,
+      (error: any) => console.log(error),
+      () => console.log('All done getting Books.')
+    );
     this.allReaders = this.dataService.getAllReaders();
     this.mostPopularBook = this.dataService.mostPopularBook;
 
@@ -29,7 +34,15 @@ export class DashboardComponent implements OnInit {
   }
 
   deleteBook(bookID: number): void {
-    console.warn(`Delete book not yet implemented (bookID: ${bookID}).`);
+  this.dataService.deleteBook(bookID).subscribe(
+    (data: void) => {
+      let index: number = this.allBooks.findIndex(book => book.bookID === bookID);
+      this.allBooks.splice(index, 1);
+    },
+    (error: any) => console.log(error),
+    ()=> console.log("Transaction Complted")
+  )
+    //console.warn(`Delete book not yet implemented (bookID: ${bookID}).`);
   }
 
   deleteReader(readerID: number): void {
