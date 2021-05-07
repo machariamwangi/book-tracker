@@ -30,7 +30,7 @@ export class DataService {
     return allReaders.find(reader => reader.readerID === id);
   }
 
-  getAllBooks():Observable<Book[]> {
+  getAllBooks():Observable<Book[]  | BookTrackerError> {
     console.warn("getting all books from the server")
     return this.http.get<Book[]>('/api/books').pipe(
     catchError(error => this.handleHttpError(error))
