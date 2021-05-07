@@ -1,9 +1,13 @@
 # Angular HTTP Communication
 
-This is the official repository for my Pluralsight course titled *Angular HTTP Communication*. 
-There are separate branches named after the modules in the course that contain the code as it 
-exists at the end of that module.
+Basics on http calls in angular
 
-I will update this repo below with any problems or small issues reported between updates to the actual course.
+# Requirements
 
-Thanks for watching and good luck on your Angular projects!
+Have node installed in your machine
+
+# To install Do the following
+npm install => T installing all the  node packages and dependancies
+
+# To Start 
+npm start => this will start the project
