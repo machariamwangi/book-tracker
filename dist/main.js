@@ -120,6 +120,48 @@ AddBookComponent = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
 
 /***/ }),
 
+/***/ "7M7W":
+/*!********************************************!*\
+  !*** ./src/app/core/http-cache.service.ts ***!
+  \********************************************/
+/*! exports provided: HttpCacheService */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HttpCacheService", function() { return HttpCacheService; });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "mrSG");
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "8Y7J");
+
+
+let HttpCacheService = class HttpCacheService {
+    constructor() {
+        this.requests = {};
+    }
+    put(url, response) {
+        this.requests[url] = response;
+    }
+    get(url) {
+        return this.requests[url];
+    }
+    invalidateUrl(url) {
+        this.requests[url] = undefined;
+    }
+    invalidateCache() {
+        this.requests = {};
+    }
+};
+HttpCacheService.ctorParameters = () => [];
+HttpCacheService = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
+    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
+        providedIn: 'root'
+    })
+], HttpCacheService);
+
+
+
+/***/ }),
+
 /***/ "A3xY":
 /*!***********************************!*\
   !*** ./src/app/app.component.css ***!
@@ -281,6 +323,43 @@ BadgeService = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
 
 /***/ }),
 
+/***/ "FkxR":
+/*!**************************************************!*\
+  !*** ./src/app/core/log-response.interceptor.ts ***!
+  \**************************************************/
+/*! exports provided: LogResponseInterceptor */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "LogResponseInterceptor", function() { return LogResponseInterceptor; });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "mrSG");
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "8Y7J");
+/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/common/http */ "IheW");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs/operators */ "kU1M");
+
+
+
+
+let LogResponseInterceptor = class LogResponseInterceptor {
+    intercept(req, next) {
+        console.log(`LogResponseInterceptor - ${req.url}`);
+        return next.handle(req)
+            .pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["tap"])(event => {
+            if (event.type == _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpEventType"].Response) {
+                console.log(event.body);
+            }
+        }));
+    }
+};
+LogResponseInterceptor = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
+    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])()
+], LogResponseInterceptor);
+
+
+
+/***/ }),
+
 /***/ "H/d9":
 /*!******************************************************************************************!*\
   !*** ./node_modules/raw-loader/dist/cjs.js!./src/app/dashboard/dashboard.component.html ***!
@@ -420,19 +499,34 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/core */ "8Y7J");
 /* harmony import */ var _angular_platform_browser__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @angular/platform-browser */ "cUpR");
 /* harmony import */ var app_core_data_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! app/core/data.service */ "QVKM");
+/* harmony import */ var app_models_bookTrackerError__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! app/models/bookTrackerError */ "+5Uy");
+/* harmony import */ var _angular_router__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @angular/router */ "iInd");
+
+
 
 
 
 
 
 let DashboardComponent = class DashboardComponent {
-    constructor(dataService, title) {
+    constructor(dataService, title, route) {
         this.dataService = dataService;
         this.title = title;
+        this.route = route;
     }
     ngOnInit() {
-        this.dataService.getAllBooks().subscribe((data) => this.allBooks = data, (error) => console.log(error), () => console.log('All done getting Books.'));
-        this.allReaders = this.dataService.getAllReaders();
+        // this.dataService.getAllBooks().subscribe(
+        //   (data: Book[]  | BookTrackerError) =>  this.allBooks = <Book[]>data,
+        //   (error: any) => console.log(error),
+        //   () => console.log('All done getting Books.')
+        // );
+        let resolvedData = this.route.snapshot.data['resolvedBooks'];
+        if (resolvedData instanceof app_models_bookTrackerError__WEBPACK_IMPORTED_MODULE_5__["BookTrackerError"]) {
+            console.log(`Dashboard Component Error: ${resolvedData.friendlyMessage}`);
+        }
+        else {
+            this.allBooks = resolvedData;
+        }
         this.mostPopularBook = this.dataService.mostPopularBook;
         this.title.setTitle(`Book Tracker`);
     }
@@ -449,7 +543,8 @@ let DashboardComponent = class DashboardComponent {
 };
 DashboardComponent.ctorParameters = () => [
     { type: app_core_data_service__WEBPACK_IMPORTED_MODULE_4__["DataService"] },
-    { type: _angular_platform_browser__WEBPACK_IMPORTED_MODULE_3__["Title"] }
+    { type: _angular_platform_browser__WEBPACK_IMPORTED_MODULE_3__["Title"] },
+    { type: _angular_router__WEBPACK_IMPORTED_MODULE_6__["ActivatedRoute"] }
 ];
 DashboardComponent = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
     Object(_angular_core__WEBPACK_IMPORTED_MODULE_2__["Component"])({
@@ -492,6 +587,37 @@ AppComponent = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
         styles: [_app_component_css__WEBPACK_IMPORTED_MODULE_2__["default"]]
     })
 ], AppComponent);
+
+
+
+/***/ }),
+
+/***/ "U7SN":
+/*!************************************************!*\
+  !*** ./src/app/core/add-header.interceptor.ts ***!
+  \************************************************/
+/*! exports provided: AddHeaderInterceptor */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "AddHeaderInterceptor", function() { return AddHeaderInterceptor; });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "mrSG");
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "8Y7J");
+
+
+let AddHeaderInterceptor = class AddHeaderInterceptor {
+    intercept(req, next) {
+        console.log(`AddHeaderInterceptor - ${req.url}`);
+        let jsonReq = req.clone({
+            setHeaders: { 'Content-Type': 'application/json' }
+        });
+        return next.handle(jsonReq);
+    }
+};
+AddHeaderInterceptor = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
+    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])()
+], AddHeaderInterceptor);
 
 
 
@@ -571,6 +697,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _edit_book_edit_book_component__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./edit-book/edit-book.component */ "C9lS");
 /* harmony import */ var _edit_reader_edit_reader_component__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./edit-reader/edit-reader.component */ "dkrA");
 /* harmony import */ var _core_book_tracker_error_handler_service__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./core/book-tracker-error-handler.service */ "1US8");
+/* harmony import */ var _core_add_header_interceptor__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./core/add-header.interceptor */ "U7SN");
+/* harmony import */ var _core_log_response_interceptor__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./core/log-response.interceptor */ "FkxR");
+/* harmony import */ var _core_cache_interceptor__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./core/cache.interceptor */ "d/16");
+
+
+
 
 
 
@@ -597,7 +729,10 @@ AppModule = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
             _add_reader_add_reader_component__WEBPACK_IMPORTED_MODULE_6__["AddReaderComponent"]
         ],
         providers: [
-            { provide: _angular_core__WEBPACK_IMPORTED_MODULE_2__["ErrorHandler"], useClass: _core_book_tracker_error_handler_service__WEBPACK_IMPORTED_MODULE_12__["BookTrackerErrorHandlerService"] }
+            { provide: _angular_core__WEBPACK_IMPORTED_MODULE_2__["ErrorHandler"], useClass: _core_book_tracker_error_handler_service__WEBPACK_IMPORTED_MODULE_12__["BookTrackerErrorHandlerService"] },
+            { provide: _angular_common_http__WEBPACK_IMPORTED_MODULE_4__["HTTP_INTERCEPTORS"], useClass: _core_add_header_interceptor__WEBPACK_IMPORTED_MODULE_13__["AddHeaderInterceptor"], multi: true },
+            { provide: _angular_common_http__WEBPACK_IMPORTED_MODULE_4__["HTTP_INTERCEPTORS"], useClass: _core_log_response_interceptor__WEBPACK_IMPORTED_MODULE_14__["LogResponseInterceptor"], multi: true },
+            { provide: _angular_common_http__WEBPACK_IMPORTED_MODULE_4__["HTTP_INTERCEPTORS"], useClass: _core_cache_interceptor__WEBPACK_IMPORTED_MODULE_15__["CacheInterceptor"], multi: true }
         ],
         imports: [
             _angular_platform_browser__WEBPACK_IMPORTED_MODULE_1__["BrowserModule"],
@@ -636,6 +771,69 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ("<div class=\"col-lg-5\">\r\n  <div class=\"well bs-component\">\r\n    <form class=\"form-horizontal\">\r\n      <fieldset>\r\n        <legend>Edit Book</legend>\r\n        <div class=\"form-group\">\r\n          <label for=\"inputTitle\" class=\"col-lg-3 control-label\">Title</label>\r\n          <div class=\"col-lg-8\">\r\n            <input type=\"text\" class=\"form-control\" id=\"inputTitle\" placeholder=\"Title\" [(ngModel)]=\"selectedBook && selectedBook.title\" name=\"title\">\r\n          </div>\r\n        </div>\r\n        <div class=\"form-group\">\r\n          <label for=\"inputAuthor\" class=\"col-lg-3 control-label\">Author</label>\r\n          <div class=\"col-lg-8\">\r\n            <input type=\"text\" class=\"form-control\" id=\"inputAuthor\" placeholder=\"Author\" [(ngModel)]=\"selectedBook && selectedBook.author\" name=\"author\">\r\n          </div>\r\n        </div>\r\n        <div class=\"form-group\">\r\n          <label for=\"inputYear\" class=\"col-lg-3 control-label\">Year</label>\r\n          <div class=\"col-lg-8\">\r\n            <input type=\"text\" class=\"form-control\" id=\"inputYear\" placeholder=\"Year Published\" [(ngModel)]=\"selectedBook && selectedBook.publicationYear\" name=\"publicationYear\">\r\n          </div>\r\n        </div>\r\n        <div class=\"form-group\">\r\n          <div class=\"col-lg-8 col-lg-offset-3\">\r\n            <button type=\"button\" class=\"btn btn-primary\" (click)=\"saveChanges()\">Save</button>\r\n            <button type=\"button\" class=\"btn btn-success\" (click)=\"setMostPopular()\">Set As Most Popular</button>\r\n          </div>\r\n        </div>\r\n      </fieldset>\r\n    </form>\r\n  </div>\r\n</div>");
+
+/***/ }),
+
+/***/ "d/16":
+/*!*******************************************!*\
+  !*** ./src/app/core/cache.interceptor.ts ***!
+  \*******************************************/
+/*! exports provided: CacheInterceptor */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CacheInterceptor", function() { return CacheInterceptor; });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "mrSG");
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "8Y7J");
+/* harmony import */ var _angular_common_http__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @angular/common/http */ "IheW");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs */ "qCKp");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs/operators */ "kU1M");
+/* harmony import */ var app_core_http_cache_service__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! app/core/http-cache.service */ "7M7W");
+
+
+
+
+
+
+let CacheInterceptor = class CacheInterceptor {
+    constructor(cacheService) {
+        this.cacheService = cacheService;
+    }
+    intercept(req, next) {
+        // pass along non-cacheable requests and invalidate cache
+        if (req.method !== 'GET') {
+            console.log(`Invalidating Cache: ${req.method} ${req.url}`);
+            this.cacheService.invalidateCache();
+            return next.handle(req);
+        }
+        //attemp to retrieve a cached response
+        const cachedResponse = this.cacheService.get(req.url);
+        //return cached response
+        if (cachedResponse) {
+            console.log(`Returning a cached Response : ${cachedResponse.url}`);
+            console.log(cachedResponse);
+            return Object(rxjs__WEBPACK_IMPORTED_MODULE_3__["of"])(cachedResponse);
+            console.log("Received all ");
+        }
+        //send request to  server and add response to cache
+        return next.handle(req)
+            .pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_4__["tap"])(event => {
+            if (event instanceof _angular_common_http__WEBPACK_IMPORTED_MODULE_2__["HttpResponse"]) {
+                console.log(`Adding item to cache: ${req.url}`);
+                this.cacheService.put(req.url, event);
+            }
+        }));
+    }
+};
+CacheInterceptor.ctorParameters = () => [
+    { type: app_core_http_cache_service__WEBPACK_IMPORTED_MODULE_5__["HttpCacheService"] }
+];
+CacheInterceptor = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
+    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])()
+], CacheInterceptor);
+
+
 
 /***/ }),
 
@@ -693,6 +891,47 @@ EditReaderComponent = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
 
 /***/ }),
 
+/***/ "qT6J":
+/*!************************************************!*\
+  !*** ./src/app/core/books-resolver.service.ts ***!
+  \************************************************/
+/*! exports provided: BooksResolverService */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BooksResolverService", function() { return BooksResolverService; });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "mrSG");
+/* harmony import */ var _angular_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @angular/core */ "8Y7J");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs */ "qCKp");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs/operators */ "kU1M");
+/* harmony import */ var app_core_data_service__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! app/core/data.service */ "QVKM");
+
+
+
+
+
+let BooksResolverService = class BooksResolverService {
+    constructor(dataService) {
+        this.dataService = dataService;
+    }
+    resolve(route, state) {
+        return this.dataService.getAllBooks().pipe(Object(rxjs_operators__WEBPACK_IMPORTED_MODULE_3__["catchError"])(error => Object(rxjs__WEBPACK_IMPORTED_MODULE_2__["of"])(error)));
+    }
+};
+BooksResolverService.ctorParameters = () => [
+    { type: app_core_data_service__WEBPACK_IMPORTED_MODULE_4__["DataService"] }
+];
+BooksResolverService = Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__decorate"])([
+    Object(_angular_core__WEBPACK_IMPORTED_MODULE_1__["Injectable"])({
+        providedIn: 'root'
+    })
+], BooksResolverService);
+
+
+
+/***/ }),
+
 /***/ "vY5A":
 /*!***************************************!*\
   !*** ./src/app/app-routing.module.ts ***!
@@ -711,6 +950,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var app_dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! app/dashboard/dashboard.component */ "QX6l");
 /* harmony import */ var app_edit_book_edit_book_component__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! app/edit-book/edit-book.component */ "C9lS");
 /* harmony import */ var app_edit_reader_edit_reader_component__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! app/edit-reader/edit-reader.component */ "dkrA");
+/* harmony import */ var _core_books_resolver_service__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./core/books-resolver.service */ "qT6J");
+
 
 
 
@@ -720,7 +961,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const routes = [
-    { path: 'dashboard', component: app_dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_5__["DashboardComponent"] },
+    { path: 'dashboard', component: app_dashboard_dashboard_component__WEBPACK_IMPORTED_MODULE_5__["DashboardComponent"], resolve: { resolvedBooks: _core_books_resolver_service__WEBPACK_IMPORTED_MODULE_8__["BooksResolverService"] } },
     { path: 'addbook', component: app_add_book_add_book_component__WEBPACK_IMPORTED_MODULE_3__["AddBookComponent"] },
     { path: 'addreader', component: app_add_reader_add_reader_component__WEBPACK_IMPORTED_MODULE_4__["AddReaderComponent"] },
     { path: 'editreader/:id', component: app_edit_reader_edit_reader_component__WEBPACK_IMPORTED_MODULE_7__["EditReaderComponent"] },
